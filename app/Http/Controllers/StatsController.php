@@ -11,16 +11,18 @@ class StatsController extends Controller
 {
     public function index()
     {
-        $mutations = DB::table('dna_samples')->where('has_mutation', true)->count();
-        $noMutations = DB::table('dna_samples')->where('has_mutation', false)->count();
+        $countMutations = DnaSample::where('has_mutation', true)->count();
+        $countNoMutation = DnaSample::where('has_mutation', false)->count();
 
-        $ratio = $noMutations === 0
-            ? 0
-            : $mutations / $noMutations;
+        $total = $countMutations + $countNoMutation;
+
+        $ratio = $total > 0
+            ? $countMutations / $total
+            : 0;
 
         return response()->json([
-            'count_mutations' => $mutations,
-            'count_no_mutation' => $noMutations,
+            'count_mutations' => $countMutations,
+            'count_no_mutation' => $countNoMutation,
             'ratio' => round($ratio, 2),
         ]);
     }
