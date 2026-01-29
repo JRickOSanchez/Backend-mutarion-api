@@ -1,59 +1,107 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mutation Detection API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST desarrollada en Laravel para detectar mutaciones genéticas a partir de secuencias de ADN.
+El servicio permite validar secuencias, almacenar resultados en base de datos y consultar estadísticas e historial de ejecuciones.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tecnologías utilizadas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP
+- Laravel
+- SQLite
+- Docker
+- Render
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Descripción del problema
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Una secuencia de ADN se representa como un arreglo de strings NxN.
+Cada carácter solo puede ser:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- A
+- T
+- C
+- G
 
-## Laravel Sponsors
+Existe mutación genética cuando se encuentran **dos o más secuencias** de **cuatro letras iguales consecutivas**, de forma:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Horizontal
+- Vertical
+- Diagonal
+- Diagonal inversa
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Endpoints disponibles
 
-## Contributing
+### POST /api/mutation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Detecta si una secuencia de ADN tiene mutación.
 
-## Code of Conduct
+**Request**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```json
+{
+    "dna": ["ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"]
+}
+```
 
-## Security Vulnerabilities
+**Responses**
+· 200 OK → Mutación detectada
+· 403 Forbidden → No es mutación
+· 400 Bad Request → Formato inválido
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## GET /api/list
 
-## License
+Devuelve las últimas 10 verificaciones realizadas, incluyendo:
+· Fecha de ejecución
+· Cadena de ADN
+· Resultado de la validación
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Instrucciones de ejecución y uso del servicio
+
+### Ejecución local
+
+**Requisitos:**
+· PHP 8 o superior
+· Composer
+
+**Pasos de instalacion local**
+En consola ejecutar los siguentes comandos en la carpeta de proyecto:
+
+```bash
+git clone https://github.com/JRickOSanchez/Backend-mutarion-api
+cd mutation-api
+composer install
+php artisan migrate
+php artisan serve
+```
+
+El servicio quedará disponible en: http://127.0.0.1:8000
+
+### Ejecución remota
+
+El servicio se encuentra desplegado en la nube y accesible públicamente en: https://mutation-api-luia.onrender.com
+
+## Ejemplos de peticiones al servicio remoto
+
+**Detectar mutación genética**
+en la consola poner:
+
+```bash
+curl -X POST https://mutation-api-luia.onrender.com/api/mutation -H "Content-Type: application/json" -H "Accept: application/json" -d "{\"dna\":[\"ATGCGA\",\"CAGTGC\",\"TTATGT\",\"AGAAGG\",\"CCCCTA\",\"TCACTG\"]}"
+```
+
+## Obtener estadísticas
+
+```bash
+curl https://mutation-api-luia.onrender.com/api/stats
+```
+
+## Notas
+
+· El backend se encuentra desplegado en la nube.
+· La base de datos utilizada es SQLite.
+· El frontend consume este servicio de forma remota.
